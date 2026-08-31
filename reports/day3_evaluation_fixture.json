@@ -1,0 +1,57 @@
+{
+  "data_kind": "COURSE_FIXTURE",
+  "split": "validation",
+  "rows": 36,
+  "macro_f1_a": {
+    "estimate": 0.7807469040247678,
+    "ci_low": 0.6212498015141271,
+    "ci_high": 0.8982313491237977,
+    "n_boot": 1000
+  },
+  "macro_f1_b": {
+    "estimate": 0.7819444444444444,
+    "ci_low": 0.6169212785382484,
+    "ci_high": 0.9042122693118788,
+    "n_boot": 1000
+  },
+  "paired_b_minus_a": {
+    "difference_b_minus_a": 0.0011975404196766792,
+    "ci_low": -0.10472316166062473,
+    "ci_high": 0.09963005211966207,
+    "supports_directional_claim": false
+  },
+  "paired_verdict": "The interval includes zero; this fixture does not support a directional superiority claim.",
+  "behavioural": {
+    "passed": 3,
+    "total": 6,
+    "pass_rate": 0.5
+  },
+  "taxonomy_counts": {
+    "dialect_gap": 3,
+    "hard_or_ambiguous": 3,
+    "class_confusion": 2
+  },
+  "top_fixes": [
+    {
+      "priority": 1,
+      "issue": "Gulf coverage for health and transport",
+      "evidence": "dialect_gap tags in validation fixture",
+      "change": "collect/review targeted Gulf examples",
+      "acceptance_test": "new behavioural cases plus sliced CI"
+    },
+    {
+      "priority": 2,
+      "issue": "class confusion around app/status wording",
+      "evidence": "EV-019 and EV-020",
+      "change": "add contrastive examples and review label guide",
+      "acceptance_test": "paired comparison without regression in other slices"
+    },
+    {
+      "priority": 3,
+      "issue": "underspecified short requests",
+      "evidence": "hard_or_ambiguous tags",
+      "change": "request context or abstain when confidence is low",
+      "acceptance_test": "ambiguity behavioural suite"
+    }
+  ]
+}

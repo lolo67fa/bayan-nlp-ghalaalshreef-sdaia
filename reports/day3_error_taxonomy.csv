@@ -1,0 +1,9 @@
+example_id,taxonomy_tag,rationale
+EV-006,dialect_gap,Gulf phrasing for a missing health result confused with transport.
+EV-007,hard_or_ambiguous,The attachment mention lacks an explicit permit cue.
+EV-010,dialect_gap,Gulf app wording obscures the prescription-renewal intent.
+EV-012,dialect_gap,Colloquial location question lacks the formal transport terms.
+EV-019,class_confusion,Status language overlaps generic digital-service failures.
+EV-020,class_confusion,Map/application cue dominates the route intent.
+EV-030,hard_or_ambiguous,Missing-record wording overlaps multiple service domains.
+EV-031,hard_or_ambiguous,The short request omits the permit noun.
