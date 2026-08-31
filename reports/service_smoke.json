@@ -1,0 +1,36 @@
+{
+  "result_label": "MEASURED",
+  "artefact_role": "PROJECT_ARTIFACT",
+  "manifest": {
+    "model_id": "/content/drive/MyDrive/bayan/model-v1",
+    "model_version": "project-v1",
+    "preprocessing_version": "ar-en-v1",
+    "runtime": "onnx-fp32",
+    "label_map": {
+      "0": "digital_service",
+      "1": "health",
+      "2": "permit",
+      "3": "transport"
+    },
+    "artifact_sha256": "13dccd6bbb6326ec4325fae93e6c650b5e3b7e2b517aaee64d736ec64fae9125"
+  },
+  "tests": {
+    "health": 200,
+    "arabic": 200,
+    "english": 200,
+    "empty_rejected": 422,
+    "unsupported_language_rejected": 422,
+    "canaries": [
+      {
+        "name": "arabic-contract",
+        "status": "PASS",
+        "label": "permit"
+      },
+      {
+        "name": "english-contract",
+        "status": "PASS",
+        "label": "transport"
+      }
+    ]
+  }
+}
