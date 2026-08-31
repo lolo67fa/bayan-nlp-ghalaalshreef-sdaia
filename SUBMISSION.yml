@@ -1,6 +1,6 @@
 course: bayan-applied-nlp
-student_github: YOUR_USERNAME
-repository: https://github.com/YOUR_USERNAME/bayan-nlp-YOUR_USERNAME
+student_github: lolo67fa
+repository: https://github.com/lolo67fa/bayan-nlp-ghalaalshreef-sdaia
 default_branch: main
 final_tag: submission-v1.0
 runtime: google-colab
