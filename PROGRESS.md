@@ -1,40 +1,34 @@
-# PROGRESS — Bayan Gates A–E
+# PROGRESS — Bayan
 
-**Student GitHub:** FILL_ME  
-**Repository:** FILL_ME  
-**Last updated:** FILL_ME
+> لا تضع علامة ✅ قبل وجود رابط commit/report/test قابل للفحص.
 
-لا تضع علامة ✅ قبل وجود رابط commit/report/test قابل للفحص.
+## Gate status
 
 | Gate | Status | Required evidence | Commit/report links | Blocker/next action |
 |---|---|---|---|---|
-| A — ingest | ⬜ | preprocessing tests + tokenizer decision | FILL_ME | FILL_ME |
-| B — tasks | ⬜ | classification + NER + QA evidence | FILL_ME | FILL_ME |
-| C — search & truth | ⬜ | search metrics + slices + taxonomy | FILL_ME | FILL_ME |
-| D — ship | ⬜ | project benchmark + API tests + canaries | FILL_ME | FILL_ME |
-| E — submit | ⬜ | validator + demo + release tag | FILL_ME | FILL_ME |
+| A — ingest | ✅ PASSED | preprocessing tests + tokenizer decision | `notebooks/01_text_processing_tokenization.ipynb`, `notebooks/02_attention_transformers.ipynb`, `DECISIONS.md#decision-d-001`, 9 tests green | Day 2 labs |
+| B — tasks | 🟨 NOT_STARTED | classification + NER + QA evidence | — | Run `notebooks/03_text_classification.ipynb` |
+| C — search & truth | 🟨 NOT_STARTED | search metrics + slices + taxonomy | — | Blocked by Gate B |
+| D — ship | 🟨 NOT_STARTED | project benchmark + API tests + canaries | — | Blocked by Gate C |
+| E — submit | 🟨 NOT_STARTED | validator + demo + release tag | — | Blocked by Gate D |
 
-Status values: `⬜ NOT_STARTED`, `🟨 IN_PROGRESS`, `✅ PASSED`, `🟥 BLOCKED`.
+Status values: `🟨 NOT_STARTED`, `🟧 IN_PROGRESS`, `✅ PASSED`, `🟥 BLOCKED`.
 
 ## Runtime/run-all evidence
 
 | Notebook | Clean run date | Core marker | Colab/GitHub link |
 |---|---|---|---|
-| 00 | FILL_ME | runtime checks | FILL_ME |
-| 01 | FILL_ME | `DAY1_NOTEBOOK1_CORE=PASS` | FILL_ME |
-| 02 | FILL_ME | `DAY1_NOTEBOOK2_CORE=PASS` | FILL_ME |
-| 03 | FILL_ME | `DAY2_NOTEBOOK3_CORE=PASS` | FILL_ME |
-| 04 | FILL_ME | `DAY2_NOTEBOOK4_CORE=PASS` | FILL_ME |
-| 05 | FILL_ME | `DAY3_NOTEBOOK5_CORE=PASS` | FILL_ME |
-| 06 | FILL_ME | `DAY3_NOTEBOOK6_CORE=PASS` | FILL_ME |
-| 07 | FILL_ME | `DAY3_NOTEBOOK7_CORE=PASS` | FILL_ME |
-| 08 | FILL_ME | `DAY4_NOTEBOOK8_CORE=PASS` | FILL_ME |
+| 00_runtime_doctor | 2026-08-30 | `BAYAN_ENV_READY = True` | `notebooks/00_runtime_doctor.ipynb` |
+| 01_text_processing_tokenization | 2026-08-30 | `DAY1_NOTEBOOK1_CORE=PASS` | `notebooks/01_text_processing_tokenization.ipynb` |
+| 02_attention_transformers | 2026-08-30 | `DAY1_NOTEBOOK2_CORE=PASS` | `notebooks/02_attention_transformers.ipynb` |
 
-## Final release
+## Day 1 — complete
 
-- Final commit: FILL_ME
-- Release/tag `submission-v1.0`: FILL_ME
-- Validator pre-tag report: FILL_ME
-- Validator `--require-tag` report: FILL_ME
-- Private-window visibility check: PASS / FAIL — FILL_ME
-- Remaining limitation: FILL_ME
+- Notebook 00 (runtime doctor): `BAYAN_ENV_READY = True`
+- Notebook 01 (text processing & tokenisation): `DAY1_NOTEBOOK1_CORE=PASS`
+- Notebook 02 (attention & transformers): `DAY1_NOTEBOOK2_CORE=PASS`, `TWO_CHECKPOINT_PARAMETER_AUDIT=PASS`, `ACTUAL_TRANSFORMER_FORWARD=PASS`
+- Tests: 9 passed — `test_day1_preprocessing`, `test_day1_tokenization`, `test_day1_attention`
+- Decision recorded: D-001 — tokenizer and Arabic preprocessing profile
+- Measured: Arabic fertility 1.39, English fertility 1.32, truncation @8 = 40%, @10 = 0%, @16 = 0%
+- Known limitation logged: `sentencizer` splits after the abbreviation "د."
+- Recovery point: all notebooks saved to GitHub with outputs
