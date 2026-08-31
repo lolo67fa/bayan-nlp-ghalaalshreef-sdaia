@@ -111,16 +111,161 @@ The R1–R7 thresholds (macro-F1 ≥ +8 points over baseline, entity-level F1 �
 - **New risk:** Reporting smoke figures without their label would misrepresent the system. Every figure above carries `MEASURED_SMOKE`.
 - **Rollback trigger:** On the frozen data, an Arabic-specific checkpoint beats the multilingual one on the Arabic slice beyond its confidence interval without harming the English slice.
 - **Rollback path:** Swap `MODEL_ID`, re-run all three heads on the same splits and seed, re-measure, and record a superseding decision.
-
 - 
 
+
+## Decision D-003 — Arabic profile and the Arabic-versus-multilingual question (Day 3)
+
+- **Date:** 2026-08-31
+- **Gate:** C
+- **Status:** accepted
+- **Owner:** Ghala Alshreef
+
+### Context | السياق
+
+D-001 chose a conservative profile and stated that any stronger transform would be adopted only with a measured task metric. Day 3 provides that measurement, and also raises a second question D-002 deferred: does an Arabic-specific checkpoint beat the multilingual one?
+
+### Decision | القرار
+
+Adopt two named, versioned profiles rather than one. `conservative` (v1.0.0) preserves diacritics and hamza forms; `search` (v1.0.0) additionally removes diacritics, unifies alef forms and maps `ى → ي`. Neither converts taa marbuta `ة` to `ه`.
+
+Do **not** switch the shared encoder to CAMeLBERT yet. Keep the multilingual encoder and open a measured comparison on the frozen data before any swap.
+
+### Evidence | الدليل
+
+- Notebook: `notebooks/05_arabic_nlp.ipynb` — `DAY3_NOTEBOOK5_CORE=PASS`, `GOLDEN_TESTS=PASS`
+- Backend: `camel-tools==1.6.0`, profile version `1.0.0`
+- Golden cases: 4 passed. The same input `إِدَارَةُ الحِساب` returns `ادارة الحساب` under `search` and is left unchanged under `conservative` — the profiles demonstrably differ
+- Fixture variants: Gulf 9 · MSA 9 · Arabizi 2
+- Arabizi routing heuristic flagged exactly `A-019` and `A-020`, with no false positives
+- `display_copy_preserved: True` — the two-copy contract from D-001 survives every transform
+- **Dialect comparison [MEASURED_SMOKE]**, identical conditions (40 optimizer steps, validation n=4, frozen Gulf test n=4): `distilbert-base-multilingual-cased` gulf_test_macro_f1 = **0.0** · `CAMeL-Lab/bert-base-arabic-camelbert-da` = **0.6667**
+- Corroborating slice evidence from `notebooks/07`: `variant=Gulf` macro-F1 0.658 against `variant=MSA` 0.837
+
+### Why taa marbuta is excluded | لماذا استُثنيت التاء المربوطة
+
+Mapping `ة` to `ه` merges distinctions that carry meaning and can corrupt entity boundaries in NER. The course classifies it as information-destroying, and no measurement here justifies it. It stays out of both profiles.
+
+### Why the encoder is not switched yet | لماذا لم نستبدل المشفر
+
+The Gulf gap is large and consistent across two independent notebooks, so the direction is credible. Three things stop it being sufficient:
+
+1. The frozen Gulf test is **4 rows**. There is no confidence interval, and `notebooks/07` demonstrates that intervals on this data are wide enough to swallow far larger differences.
+2. CAMeLBERT is Arabic-only. Bayan is bilingual by definition; swapping the shared encoder would trade a measured Arabic gain for an unmeasured English loss.
+3. `result_type` is `MEASURED_SMOKE`. The rollback trigger written into D-002 requires a frozen-data result beyond its confidence interval. That bar is not met.
+
+### Consequences and rollback | الأثر والرجوع
+
+- **Positive consequence:** Preprocessing is now a named, versioned, testable artefact with golden tests that run before any corpus is touched.
+- **Limitation:** The Arabizi heuristic is a transparent routing rule, not dialect identification, and the notebook asserts it is never described as a classifier.
+- **New risk:** Two profiles means two contracts. Whichever is used at serve time must be the one used at train and eval time, and its version must be recorded with every result.
+- **Rollback trigger:** On the frozen dataset with confidence intervals, an Arabic checkpoint beats the multilingual one on the Arabic slice without harming the English slice.
+- **Rollback path:** Either swap `MODEL_ID` and re-measure all three heads, or route Arabic and English to separate encoders and measure the added serving cost.
+
+---
+
+## Decision D-004 — Semantic search: frozen threshold, and re-ranking rejected (Day 3)
+
+- **Date:** 2026-08-31
+- **Gate:** C
+- **Status:** accepted
+- **Owner:** Ghala Alshreef
+
+### Context | السياق
+
+Retrieval needs three fixed choices: how vectors are compared, where the no-answer boundary sits, and whether a second-stage re-ranker earns its cost.
+
+### Decision | القرار
+
+Sentence embeddings, L2-normalised on both corpus and query side, indexed with FAISS `IndexFlatIP` so inner product equals cosine similarity. The no-answer threshold is tuned on validation only, then frozen at **0.4592** and applied unchanged to the test split. The cross-encoder re-ranker is **rejected**.
+
+### Evidence | الدليل
+
+- Notebook: `notebooks/06_semantic_search.ipynb` — `DAY3_NOTEBOOK6_CORE=PASS`
+- Reports: `reports/search_manifest.json`, `reports/retrieval_metrics.json`
+- `l2_normalised: True` — every vector norm equals 1.0 within 1e-5 on both sides
+- `faiss_count_matches: True` — `index.ntotal == 24`; `manifest_matches: True`
+- `validation_only_threshold: True` — the threshold never saw test data
+- Threshold tuning: validation_accuracy **1.0** at 0.4592; test no_answer_accuracy **1.0** with the frozen value
+- **Retrieval [MEASURED_SMOKE]**, 6 answerable test queries: recall@3 **1.0**, mrr@3 **0.6667**
+- Slices, all flagged `SMALL_SLICE`: `language=ar` mrr@3 **0.5** · `language=en` **0.833** · `cross_lingual` **0.5** · `monolingual` **0.75**
+- Re-ranking: `warmup_excluded: True`, decision **`REJECT_NO_MEASURED_LIFT`** — no mrr@3 improvement over the retrieval-only ranking
+
+### Why symmetric normalisation matters | لماذا التطبيع المتماثل
+
+Inner product equals cosine similarity only when both sides are unit-length. Normalising one side alone still produces a plausible-looking ranking that no longer means cosine — a failure invisible to inspection. The notebook asserts the norm on both sides for exactly this reason.
+
+### Why the re-ranker was rejected | لماذا رُفض إعادة الترتيب
+
+It produced no measured lift on this data. A component added because it is expected to help, without evidence that it does, adds latency and a failure mode for nothing. The course rule is explicit: an extension that runs without a baseline or without measurement earns no credit.
+
+### Consequences and rollback | الأثر والرجوع
+
+- **Positive consequence:** Retrieval finds the right case within the top 3 every time on this fixture, and the no-answer boundary was validated on data it was not tuned on.
+- **Limitation 1:** recall@3 of 1.0 alongside mrr@3 of 0.6667 means the correct case is present but not always ranked first. Recall answers "did we find it"; MRR answers "at what rank". The gap is a real user-experience cost.
+- **Limitation 2:** Arabic mrr@3 (0.5) trails English (0.833) by a third, and cross-lingual retrieval matches the weaker figure. Ranking quality is not uniform across the bilingual scope.
+- **Limitation 3:** Six answerable test queries, every slice below 10. CPU timing depends on the runtime.
+- **Rollback trigger for the re-ranker:** a measured mrr@3 lift on the frozen data that exceeds the added p95 latency budget.
+- **Rollback path for the threshold:** re-tune on validation only, re-freeze, re-run the test split, and supersede this record.
+
+---
+
+## Decision D-005 — Evaluation method: intervals, slices and ranked fixes (Day 3)
+
+- **Date:** 2026-08-31
+- **Gate:** C
+- **Status:** accepted
+- **Owner:** Ghala Alshreef
+
+### Context | السياق
+
+Every number produced so far came from a small sample. Before any of them is reported as a result, the project needs a rule for when a difference may be called a difference.
+
+### Decision | القرار
+
+No directional claim is made from a point estimate alone. Every headline metric is reported with a bootstrap confidence interval; model-to-model comparisons use paired bootstrap on the same rows; results are broken out by language, variant and length bucket, with any slice under `min_slice_size=15` flagged `SMALL_SLICE` rather than dropped.
+
+### Evidence | الدليل
+
+- Notebook: `notebooks/07_evaluation_error_analysis.ipynb` — `DAY3_NOTEBOOK7_CORE=PASS`, all ten core checks True
+- Reports: `reports/day3_evaluation_fixture.json`, `reports/day3_slice_report.csv`, `reports/day3_error_taxonomy.csv`
+- Data: 36 rows, validation split, labelled `COURSE_FIXTURE` — course-supplied predictions for teaching evaluation method, **not** this project's model outputs
+- Bootstrap: `n_boot=1000` overall, `n_boot=500` per slice, seed 42
+- **Fixture A** macro-F1 0.7807, CI [0.6212, 0.8982] · **Fixture B** 0.7819, CI [0.6169, 0.9042]
+- Slices: ALL 0.782 (n=36) · `language=ar` 0.758 (n=24) · `language=en` 0.829 (n=12, SMALL_SLICE) · `variant=Gulf` 0.658 (n=12, SMALL_SLICE) · `variant=MSA` 0.837 (n=12, SMALL_SLICE) · `length_bucket=long` **0.526** (n=18) · `length_bucket=short` 0.829 (n=18)
+- Manual error taxonomy over tagged errors, each asserted to be a genuine error and non-duplicated
+- Three ranked fixes recorded with priorities 1, 2, 3
+
+### The central finding | النتيجة الجوهرية
+
+Fixture B leads Fixture A by **0.0012** — and their confidence intervals overlap almost entirely. On 36 rows this difference is noise, not improvement. Reported as a point estimate it would read as a win; reported with an interval it reads as "cannot distinguish".
+
+This governs how every earlier figure in this project is read, including the −0.1167 classification delta in D-002.
+
+### Slice findings | نتائج الشرائح
+
+1. **Length is the largest measured gap.** Long texts score 0.526 against 0.829 for short — roughly 30 points, and this is the most trustworthy comparison in the table because both buckets hold 18 rows and neither is flagged `SMALL_SLICE`.
+2. **Gulf trails MSA by ~18 points**, consistent with the independent dialect comparison in D-003.
+3. **Arabic trails English**, consistent with the retrieval slices in D-004.
+4. Any slice whose `ci_high` reaches 1.0 (`language=en`, both variants) is too small to carry a conclusion; the flag is kept and the row retained rather than deleted.
+
+### Consequences and rollback | الأثر والرجوع
+
+- **Positive consequence:** The project now has a rule that prevents reporting noise as progress, and three independent lines of evidence converge on the same weak slices.
+- **Limitation 1:** Slice intervals used `n_boot=500` rather than 1000 to keep runtime down; intervals are marginally coarser than the headline figures.
+- **Limitation 2:** Every figure derives from `COURSE_FIXTURE` predictions. Before submission these are replaced with this project's own validation predictions.
+- **Limitation 3:** Single seed. Seed variance is unmeasured.
+- **Rollback trigger:** If replacing the fixture with project predictions changes which slices are weakest, the ranked fixes are re-derived.
+- **Rollback path:** Re-run the notebook against project predictions, regenerate all three reports, and supersede this record.
+
+  
 ## قرارات إلزامية قبل Gate E
 
 - [x] tokenizer + max length — D-001
 - [x] Arabic preprocessing profile — D-001
 - [x] task model/baseline and split — D-002
-- [ ] semantic encoder/index/k/threshold
-- [ ] metric/slices/error priorities
+- [x] semantic encoder/index/k/threshold — D-004
+- [x] metric/slices/error priorities — D-005
 - [ ] performance budget
 - [ ] ONNX/INT8 adopt or reject
 - [ ] served artefact + preprocessing/label versions
