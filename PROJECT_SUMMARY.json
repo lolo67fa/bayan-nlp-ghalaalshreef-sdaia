@@ -4,11 +4,11 @@
   "languages": ["ar", "en"],
   "tasks": ["classification", "sentiment", "ner", "qa", "semantic_search"],
   "extension": {
-    "name": "FILL_ME",
-    "evidence": "FILL_ME"
+    "name": "Arabic-vs-multilingual encoder probe on a frozen Gulf slice",
+    "evidence": "notebooks/05_arabic_nlp.ipynb — identical conditions (same seed, same 40 optimizer steps, same frozen Gulf test): distilbert-base-multilingual-cased scored gulf_test_macro_f1 0.0 against CAMeL-Lab/bert-base-arabic-camelbert-da at 0.6667. Corroborated by notebooks/07 slice analysis (variant=Gulf 0.658 vs variant=MSA 0.837). Decision recorded in DECISIONS.md#decision-d-003: REJECT_FOR_NOW — the direction is credible but the frozen Gulf test is 4 rows with no confidence interval, and an Arabic-only encoder would trade a measured Arabic gain for an unmeasured English loss in a bilingual system. Adoption is gated on a frozen-data comparison with intervals on both language slices."
   },
   "benchmark_mode": "PROJECT_ARTIFACT",
   "final_tag": "submission-v1.0",
-  "privacy_check": false,
-  "tests_passed": false
+  "privacy_check": true,
+  "tests_passed": true
 }
