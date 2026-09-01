@@ -138,7 +138,9 @@ Perfect recall with MRR of 0.667 means the correct case is always present in the
 
 Arabic ranking (0.5) trails English (0.833) by a third, and cross-lingual retrieval matches the weaker figure.
 
-**Re-ranking: `REJECT_NO_MEASURED_LIFT`.** The cross-encoder produced no measured mrr@3 improvement (warm-up excluded from timing). A component added because it is expected to help, without evidence that it does, buys latency and a failure mode for nothing.
+**Re-ranking: `ADOPT_FOR_EXPERIMENT`.** The cross-encoder raised mrr@3 from **0.6667 to 0.7222** (delta **+0.0556**), with warm-up excluded from the timing. Median re-ranking latency 15.70 ms, p95 17.16 ms.
+
+The lift is consistent with the diagnosis above: recall was already 1.0, so the weakness was ordering, not retrieval — and reordering is precisely what a cross-encoder does. The status stops short of serving adoption because six answerable test queries cannot separate a real gain from resampling noise, and because a second stage now carries a measured latency cost with no budget allocated for it. Full adoption requires a lift on the frozen data whose confidence interval excludes zero.
 
 ---
 
