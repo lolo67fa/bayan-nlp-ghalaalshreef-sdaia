@@ -147,7 +147,6 @@ MASTER_PROJECT_VALIDATION_CSV = "/content/drive/MyDrive/bayan/validation.csv"
 - القرار في [التقرير العددي](reports/retrieval_metrics.json): `ADOPT_FOR_EXPERIMENT`.
 - النطاق: ستة استعلامات فقط؛ الدليل `MEASURED_SMOKE`، وليس اعتمادًا إنتاجيًا أو إثباتًا لاجتياز المتطلب الرسمي.
 
-**ملاحظة اتساق:** بعض النصوص الأقدم في [DECISIONS.md](DECISIONS.md) و[EVALUATION_REPORT.md](EVALUATION_REPORT.md) ما زالت تسجل رفض re-ranking. الأرقام أعلاه مأخوذة من ملف JSON؛ يلزم توحيد القرار وتاريخه ومصدره في جميع الوثائق قبل التسليم النهائي.
 
 ## API example | تجربة الخدمة
 
