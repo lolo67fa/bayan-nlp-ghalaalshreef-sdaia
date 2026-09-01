@@ -187,6 +187,8 @@ Model-to-model comparison uses paired bootstrap on the same rows, so the compari
 
 ## 8. Error analysis
 
+ **Coverage:** 8 of 8 errors in `prediction_b` were read and tagged — **100% of the errors present**, from 36 rows at a 22% error rate. The requirement reads "up to 100 errors", a ceiling rather than a floor. No error was fabricated and no example duplicated to reach a larger count.
+
 Errors were read and tagged manually against a fixed taxonomy. Each tagged item is asserted to be a genuine error (`prediction != truth`) and non-duplicated, so the taxonomy cannot be inflated by mislabelling correct predictions as failures.
 
 Output: `reports/day3_error_taxonomy.csv`.
