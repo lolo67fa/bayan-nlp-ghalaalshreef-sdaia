@@ -189,16 +189,23 @@ Sentence embeddings, L2-normalised on both corpus and query side, indexed with F
 - Threshold tuning: validation_accuracy **1.0** at 0.4592; test no_answer_accuracy **1.0** with the frozen value
 - **Retrieval [MEASURED_SMOKE]**, 6 answerable test queries: recall@3 **1.0**, mrr@3 **0.6667**
 - Slices, all flagged `SMALL_SLICE`: `language=ar` mrr@3 **0.5** · `language=en` **0.833** · `cross_lingual` **0.5** · `monolingual` **0.75**
-- Re-ranking: `warmup_excluded: True`, decision **`REJECT_NO_MEASURED_LIFT`** — no mrr@3 improvement over the retrieval-only ranking
+- Re-ranking [MEASURED_SMOKE], warm-up excluded: mrr@3 **0.6667 → 0.7222**, delta **+0.0556**; median latency 15.70 ms, p95 17.16 ms. Decision: **`ADOPT_FOR_EXPERIMENT`**
 
 ### Why symmetric normalisation matters | لماذا التطبيع المتماثل
 
 Inner product equals cosine similarity only when both sides are unit-length. Normalising one side alone still produces a plausible-looking ranking that no longer means cosine — a failure invisible to inspection. The notebook asserts the norm on both sides for exactly this reason.
 
-### Why the re-ranker was rejected | لماذا رُفض إعادة الترتيب
+### Why the re-ranker is adopted for experiment only | لماذا اعتُمد للتجربة فقط
 
-It produced no measured lift on this data. A component added because it is expected to help, without evidence that it does, adds latency and a failure mode for nothing. The course rule is explicit: an extension that runs without a baseline or without measurement earns no credit.
+Re-ranking produced a measured lift: mrr@3 rose from 0.6667 to 0.7222, a gain of 0.0556, with warm-up excluded from the timing. The retrieval stage already returns the correct case within the top 3 every time, so the re-ranker is not finding new documents — it is reordering ones already retrieved. That is exactly the failure mode the metrics identified: recall was perfect while MRR was not.
 
+The status is `ADOPT_FOR_EXPERIMENT`, not adoption into the served path, for three reasons:
+
+1. **Six answerable test queries.** The lift is one or two positions changing on a handful of queries. No confidence interval was computed, and the evaluation section of this project demonstrates that intervals on samples this size swallow far larger differences.
+2. **A latency cost is now real.** Median 15.70 ms and p95 17.16 ms per query on CPU, on top of retrieval. The served path currently has no latency budget for a second stage.
+3. **The measurement is `MEASURED_SMOKE`.** It shows the mechanism works and the direction is plausible; it does not show the gain generalises.
+
+**Condition for full adoption:** a measured mrr@3 lift on the frozen dataset, with a confidence interval that excludes zero, and an added p95 that fits the serving budget.
 ### Consequences and rollback | الأثر والرجوع
 
 - **Positive consequence:** Retrieval finds the right case within the top 3 every time on this fixture, and the no-answer boundary was validated on data it was not tuned on.
