@@ -1,13 +1,15 @@
 # بيان | Bayan
 
 ### Bilingual Applied NLP — Arabic & English
-
 [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/lolo67fa/bayan-nlp-ghalaalshreef-sdaia/blob/main/BayanFullProject_Master.ipynb)
 [![SDAIA Academy](https://img.shields.io/badge/SDAIA%20Academy-SDA--AIE--211-006C67)](https://github.com/SDAIAAcademy)
 ![Languages](https://img.shields.io/badge/Languages-Arabic%20%26%20English-2563EB)
 ![Scope](https://img.shields.io/badge/Scope-Educational%20Project-64748B)
+![Validator](https://img.shields.io/badge/Validator-PASS-16A34A)
+![Tests](https://img.shields.io/badge/Tests-79%20passed-16A34A)
+![Notebooks](https://img.shields.io/badge/Notebooks-9%20executed-2563EB)
 
-**Student:** Ghala Ahmad Alshreef  
+**Student:** Ghala Ahmad Alshreef
 **GitHub:** [@lolo67fa](https://github.com/lolo67fa)  
 **Programme:** SDA-AIE-211 — Natural Language Processing with Transformers  
 **Evidence reviewed:** 2026-09-01
