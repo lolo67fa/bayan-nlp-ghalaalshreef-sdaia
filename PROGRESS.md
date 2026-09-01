@@ -53,7 +53,7 @@ Status values: `🟨 NOT_STARTED`, `🟧 IN_PROGRESS`, `✅ PASSED`, `🟥 BLOCK
 - Notebook 07 (evaluation & error analysis): `DAY3_NOTEBOOK7_CORE=PASS`
 - Tests: 19 passed — `test_day3_arabic_profiles`, `test_day3_error_analysis`, `test_day3_eval_stats`, `test_day3_retrieval`
 - Reports written: `search_manifest.json`, `retrieval_metrics.json`, `day3_evaluation_fixture.json`, `day3_slice_report.csv`, `day3_error_taxonomy.csv`
-- Measured (MEASURED_SMOKE): recall@3 1.0 · mrr@3 0.6667 · frozen threshold 0.4592 · re-ranking REJECT_NO_MEASURED_LIFT
+- Measured (MEASURED_SMOKE): recall@3 1.0 · mrr@3 0.6667 · frozen threshold 0.4592 · re-ranking ADOPT_FOR_EXPERIMENT (mrr@3 0.6667 → 0.7222, +0.0556)
 - Measured (COURSE_FIXTURE): fixture A 0.7807 CI [0.621, 0.898] vs B 0.7819 CI [0.617, 0.904] — overlapping, difference is noise
 - Largest slice gap: `length_bucket=long` 0.526 vs `short` 0.829
 - Decisions recorded: D-003 (Arabic profile), D-004 (search), D-005 (evaluation method)
