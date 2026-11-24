@@ -266,6 +266,42 @@ This governs how every earlier figure in this project is read, including the −
 - **Rollback path:** Re-run the notebook against project predictions, regenerate all three reports, and supersede this record.
 
   
+## Decision D-006 — Public "Try Bayan" demo on CPU
+
+- **Date:** 2026-11-24
+- **Status:** accepted
+- **Owner:** Ghala Alshreef
+
+### Context | السياق
+
+The project could only be tried from Colab. The fine-tuned DistilBERT and its ONNX export live in a private Drive folder (`/content/drive/MyDrive/bayan/model-v1`), and the FastAPI service existed only inside a Notebook 08 session. A visitor had no way to try a request.
+
+### Decision | القرار
+
+Ship `demo/`: one page plus a small FastAPI API that rebuilds everything from `data/sample` at startup.
+
+- **Topic:** the TF-IDF `char_wb` (3,5) + LinearSVC baseline from D-002, retrained on the 24 training rows. It is named on the page as the baseline. The private DistilBERT is not used.
+- **Search:** the D-004 encoder, symmetric L2 normalisation and the validation-only threshold. Search uses exact NumPy inner product (`bayan.retrieval.exact_inner_product_search`) instead of FAISS. For 24 vectors this is the same `IndexFlatIP` ranking with one dependency fewer.
+- **Arabic profile:** the D-004 search profile is implemented with `bayan.preprocessing.normalize_arabic` instead of CAMeL Tools.
+
+### Evidence | الدليل
+
+A fresh CPU run reproduces the recorded values. These checks run in `demo/test_demo.py`:
+
+| Value | Recorded | Demo at startup |
+|---|---|---|
+| Baseline validation macro-F1 | 0.6667 | 0.6667 |
+| No-answer threshold | 0.4592 | 0.4592 |
+| Test Recall@3 / MRR@3 | 1.0 / 0.6667 | 1.0 / 0.6667 |
+| Test no-answer accuracy | 1.0 | 1.0 |
+
+### Consequences | الأثر
+
+- The page shows only what it ran. NER, QA, re-ranking and the ONNX comparison stay in the notebooks, linked from the page.
+- The baseline makes visible mistakes on short Gulf requests (for example «ما وصلني رمز التحقق على الجوال» → permit). The page shows them as they are.
+- **Rollback trigger:** if the DistilBERT weights become public, serve the ONNX FP32 artefact adopted in BENCHMARKS.md behind the same `/api/analyze` contract and re-run `demo/test_demo.py`.
+
+
 ## قرارات إلزامية قبل Gate E
 
 - [x] tokenizer + max length — D-001
