@@ -22,6 +22,24 @@
 
 **Bayan is an educational Arabic–English NLP project connecting text preparation, task-model experiments, semantic retrieval, evaluation, and a tested classification API. It uses synthetic course data and makes no production-quality claim.**
 
+## Try Bayan | جرّب بيان
+
+<img src="demo/screenshots/try-bayan.png" alt="Try Bayan: an Arabic request about a bus stop, predicted as Transport, with the closest past case found in English" width="100%">
+
+صفحة واحدة تجيب عن سؤال: **كيف يفهم بيان طلب الخدمة؟** اكتبي طلبًا بالعربية أو الإنجليزية، فيظهر موضوعه وأقرب حالة سابقة له، حتى لو كانت الحالة بلغة أخرى. A one-page demo on CPU: Bayan predicts the topic of an Arabic or English request and finds the closest past case, including across languages.
+
+```bash
+pip install torch --index-url https://download.pytorch.org/whl/cpu
+pip install -r demo/requirements.txt
+uvicorn demo.app:app --port 7860        # then open http://localhost:7860
+```
+
+- **Topic:** the TF-IDF + LinearSVC baseline, retrained from `data/sample` when the server starts. The fine-tuned DistilBERT weights are private, so they are not used here.
+- **Search:** multilingual MiniLM over 24 synthetic cases, with the no-answer threshold tuned on validation queries only.
+- **Reproduced results:** a fresh start reproduces validation macro-F1 0.6667, threshold 0.4592, and test Recall@3 1.0 / MRR@3 0.667.
+
+Details, Docker and the Hugging Face deployment steps are in [demo/README.md](demo/README.md).
+
 ## Current status | الحالة الحالية
 
 - اللابات `00–08` موجودة، وبها مخرجات تشغيل محفوظة وعلامات نجاح Core.

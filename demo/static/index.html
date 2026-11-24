@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Try Bayan · جرّب بيان</title>
+<meta name="description" content="Try Bayan: type an Arabic or English service request and see its predicted topic and the closest past case, across languages.">
+<link rel="icon" href="/static/mark.svg?v=7" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="/static/bayan.css?v=7">
+</head>
+<body>
+<a class="skip" href="#request" data-i18n="skip">Skip to the request box</a>
+<header class="top">
+  <div class="wrap top-row">
+    <a class="brand" href="https://github.com/lolo67fa/bayan-nlp-ghalaalshreef-sdaia" aria-label="Bayan on GitHub">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="brand-ar" lang="ar">بيان</span><span class="brand-en">Bayan</span>
+    </a>
+    <div class="top-actions">
+      <span class="pill" id="search-pill" role="status"><span class="dot"></span><span id="search-pill-text" data-i18n="statusChecking">Checking models…</span></span>
+      <button type="button" class="btn-ghost" id="lang-toggle" lang="ar">العربية</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="intro">
+    <p class="eyebrow" data-i18n="eyebrow">Arabic &amp; English NLP · SDAIA Academy project</p>
+    <h1 data-i18n="title">How does Bayan understand a service request?</h1>
+    <p class="lede" data-i18n="lede">Type a request in Arabic or English, or pick an example. Bayan predicts its topic and looks for the closest past case, even when that case is written in the other language.</p>
+  </section>
+
+  <section class="composer" aria-labelledby="request-label">
+    <label id="request-label" for="request" class="label" data-i18n="requestLabel">Service request</label>
+    <textarea id="request" dir="auto" rows="2" maxlength="1000" spellcheck="false" data-i18n-ph="placeholder" placeholder="e.g. The bus was over thirty minutes late"></textarea>
+    <div class="composer-row">
+      <div class="examples" role="group" aria-labelledby="examples-label">
+        <span id="examples-label" class="label small" data-i18n="examples">Try an example</span>
+        <div class="chips" id="chips"></div>
+      </div>
+      <button type="button" class="btn-primary" id="analyze"><span data-i18n="analyze">Analyse</span><kbd aria-hidden="true">⌘↵</kbd></button>
+    </div>
+    <p class="hint" id="form-error" role="alert" hidden></p>
+  </section>
+
+  <section id="result" class="result" aria-live="polite" aria-busy="false" hidden></section>
+
+  <section class="how" aria-labelledby="how-title">
+    <h2 id="how-title" data-i18n="howTitle">What runs behind this page</h2>
+    <ol class="pipeline">
+      <li><h3 data-i18n="step1Title">Mask</h3><p data-i18n="step1Body">Emails and Saudi mobile numbers are replaced before any model sees the text.</p></li>
+      <li><h3 data-i18n="step2Title">Topic</h3><p data-i18n="step2Body">TF-IDF on character 3–5-grams + LinearSVC, the Notebook 03 baseline, retrained at startup on 24 synthetic rows.</p></li>
+      <li><h3 data-i18n="step3Title">Embed</h3><p data-i18n="step3Body">Multilingual MiniLM puts Arabic and English text in one vector space: 24 past cases, 12 in each language.</p></li>
+      <li><h3 data-i18n="step4Title">Retrieve</h3><p data-i18n="step4Body">Exact inner-product search (the FAISS IndexFlatIP ranking of Notebook 06) and a no-answer threshold tuned on validation only.</p></li>
+    </ol>
+    <div class="facts">
+      <p id="topic-metric">—</p>
+      <p id="search-metric">—</p>
+    </div>
+    <p class="not" data-i18n="howNotBody">The fine-tuned multilingual DistilBERT and its ONNX export are stored privately, so this page uses the baseline. NER, extractive QA and cross-encoder re-ranking stay in the notebooks.</p>
+    <ul class="links">
+      <li><a href="https://github.com/lolo67fa/bayan-nlp-ghalaalshreef-sdaia/blob/main/notebooks/03_text_classification.ipynb">Notebook 03 · Classification</a></li>
+      <li><a href="https://github.com/lolo67fa/bayan-nlp-ghalaalshreef-sdaia/blob/main/notebooks/04_ner_and_qa.ipynb">Notebook 04 · NER &amp; QA</a></li>
+      <li><a href="https://github.com/lolo67fa/bayan-nlp-ghalaalshreef-sdaia/blob/main/notebooks/06_semantic_search.ipynb">Notebook 06 · Semantic search</a></li>
+      <li><a href="https://github.com/lolo67fa/bayan-nlp-ghalaalshreef-sdaia/blob/main/notebooks/08_optimization_serving.ipynb">Notebook 08 · ONNX &amp; FastAPI</a></li>
+      <li><a href="https://github.com/lolo67fa/bayan-nlp-ghalaalshreef-sdaia/blob/main/EVALUATION_REPORT.md" data-i18n="evalReport">Evaluation report</a></li>
+    </ul>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-row">
+    <p data-i18n="foot">Built by Ghala Alshreef in the SDA-AIE-211 NLP with Transformers programme, SDAIA Academy. All data is synthetic course data. Educational project; not an official service.</p>
+    <p class="foot-links"><a href="https://github.com/lolo67fa/bayan-nlp-ghalaalshreef-sdaia" data-i18n="code">Code on GitHub</a> · <a href="https://lolo67fa.github.io/ghala-portfolio/" data-i18n="portfolio">Portfolio</a></p>
+  </div>
+</footer>
+
+<script src="/static/bayan.js?v=7"></script>
+</body>
+</html>
