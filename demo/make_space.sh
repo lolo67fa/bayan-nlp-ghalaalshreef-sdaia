@@ -12,15 +12,16 @@ mkdir -p "$OUT/src" "$OUT/data"
 cp -R "$ROOT/src/bayan" "$OUT/src/bayan"
 cp -R "$ROOT/data/sample" "$OUT/data/sample"
 cp -R "$ROOT/demo" "$OUT/demo"
-rm -rf "$OUT/demo/__pycache__" "$OUT/src/bayan/__pycache__"
+# Spaces reject plain binary files without Git LFS; the page does not need the screenshot.
+rm -rf "$OUT/demo/__pycache__" "$OUT/src/bayan/__pycache__" "$OUT/demo/screenshots"
 cp "$ROOT/demo/Dockerfile" "$OUT/Dockerfile"
 
 cat > "$OUT/README.md" <<'EOF'
 ---
 title: Bayan · بيان
 emoji: 📝
-colorFrom: green
-colorTo: yellow
+colorFrom: red
+colorTo: indigo
 sdk: docker
 app_port: 7860
 pinned: false
